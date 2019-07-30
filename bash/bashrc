@@ -1,0 +1,128 @@
+# .bashrc
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
+
+# User specific aliases and functions
+
+platform='unknown'
+unamestr=`uname`
+if [[ "$unamestr" == 'Linux' ]]; then
+  platform='linux'
+elif [[ "$unamestr" == 'FreeBSD' ]]; then
+  platform='freebsd'
+elif [[ "$unamestr" == 'Darwin'* ]]; then
+  platform='osx'
+fi
+
+# http://superuser.com/questions/39751/add-directory-to-path-if-its-not-already-there
+pathadd() {
+  # Check if the passed arg is a directory that exists and that it's not in the path
+  if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
+    # PATH="${PATH:+"$PATH:"}$1" # This adds to the end of PATH
+    PATH="$1${PATH:+":$PATH"}" # This adds to the start of PATH
+  fi
+}
+
+export EDITOR='vim';
+
+if [[ ($platform == 'osx') ]]; then
+  # for my local machine
+  export JAVA_HOME=/usr/local/java/latest
+  export ANDROID_HOME=/Users/$USER/Library/Android/sdk
+  pathadd $ANDROID_HOME/platform-tools
+  pathadd $ANDROID_HOME/tools
+  # In theory this should be some command that sets sensitivity independent of accel but it doesn't fucking exist fuck you apple https://apple.stackexchange.com/questions/333989/how-do-i-disable-mouse-acceleration-and-adjust-tracking-speed-in-high-sierra
+  # defaults write .GlobalPreferences com.apple.mouse.scaling -float 0.135
+  defaults write .GlobalPreferences com.apple.mouse.scaling -1
+else
+  # for servers
+  export JAVA_HOME=/usr/java/latest
+fi
+
+pathadd $JAVA_HOME/bin
+
+#fast search in files, piped through cut to truncate long lines
+function acki() {
+  ack --ignore-dir=web-compiled "$@" | cut -c 1-200;
+}
+
+#fast case insensitive search in files, piped through cut to truncate long lines
+function ackii() {
+  ack -i --ignore-dir=web-compiled "$@" | cut -c 1-200;
+}
+
+#opens files with a specific name
+#usage fo file.txt
+function fo() {
+   vi `find -name $@`
+}
+
+#shows files with a specific name
+#usage f file.txt
+function f() {
+   find -name "$@"
+}
+
+#shows files with a specific name (case insensitive)
+#not named fi because that is a reserved word in bash (endif)
+#this ignores .git directories
+#usage fii file.txt
+#usage fii *File*
+function fii() {
+   find . -path "*/.git" -prune -o -iname "$@" -print
+}
+
+function dotf() {
+  echo "cd ~/.dotfiles;"
+  cd ~/.dotfiles;
+}
+
+alias subup='git submodule update'
+
+#use color with ls
+if [[ $platform == 'linux' ]]; then
+  alias ls='ls --color=always'
+elif [[ ($platform == 'freebsd') || ($platform == 'osx')]]; then
+  alias ls='ls -G'
+# elif [[ $platform == 'osx' ]]; then
+  # alias ls='ls -G'
+fi
+
+#allows you to use this bashrc alias to automatically source this file after you modify it
+alias bashrc='vi ~/.bashrc ; source ~/.bashrc'
+
+#opens the vimrc source that I care about
+alias vimrc='vi ~/.dotfiles/vim/dotvim/dotvim.vim;'
+
+#word diff (pfay typically prefers this to standard git diff)
+alias wdiff='git diff --color-words'
+
+#character diff (helpful for seeing changes of a few characters within a word)
+alias cdiff='git diff --word-diff-regex=.'
+
+#I don't want to use vi for anything - use vim instead if I fuck it up
+#Most distros map vi to vim already so this isn't really necessary
+alias vi='vim'
+
+#slow search (Find in Files)
+function ff() {
+  find . -regextype posix-egrep -type f ! -regex '.*/.git/.*' ! -iregex '.*\.(swf|gif|jpg|png|db|gz|jar)$' -exec grep -n "$@" '{}' /dev/null \;
+}
+
+#find in files piped to cut to truncate long lines (or huge files that are all on one line)
+function ffc() {
+  ff "$@" | cut -c 1-200;
+}
+
+# from http://unix.stackexchange.com/questions/159253/decoding-url-encoding-percent-encoding
+alias urldecode='python -c "import sys, urllib as ul; print ul.unquote_plus(sys.argv[1])"'
+
+alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.argv[1])"'
+
+# alias rsa='ssh-add /home/pfay/.ssh/id_rsa'
+alias rsa='eval `ssh-agent`; ssh-add'
+
+alias jsonlint='python -m json.tool'
