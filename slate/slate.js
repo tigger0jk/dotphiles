@@ -139,6 +139,13 @@ var monRightBottom = S.op("move", {
   "width" : "screenSizeX",
   "height" : "screenSizeY/2"
 });
+var monRightTinyMiddle = S.op("move", {
+  "screen" : monRight,
+  "x" : "screenOriginX + 3*screenSizeX/8",
+  "y" : "screenOriginY + 7*screenSizeY/16",
+  "width" : "screenSizeX/4",
+  "height" : "screenSizeY/8"
+});
 var lapCalendar = S.op("move", {
   "screen" : monLaptop,
   "x" : "screenOriginX+-189",
@@ -185,6 +192,13 @@ var centerMonThreeQuarters = slate.operation("move", {
 var centerMonMost = slate.operation("move", {
    "screen" : monCenter,
    "x" : "screenOriginX+screenSizeX/20",
+   "y" : "screenOriginY+screenSizeY/20",
+   "width" : "9*screenSizeX/10",
+   "height" : "9*screenSizeY/10"
+});
+var centerMonMostRight = slate.operation("move", {
+   "screen" : monCenter,
+   "x" : "screenOriginX+screenSizeX/10",
    "y" : "screenOriginY+screenSizeY/20",
    "width" : "9*screenSizeX/10",
    "height" : "9*screenSizeY/10"
@@ -284,6 +298,10 @@ var centerMonMostHash = {
   "operations" : [centerMonMost],
   "repeat" : true
 };
+var centerMonMostRightHash = {
+  "operations" : [centerMonMostRight],
+  "repeat" : true
+};
 var centerMonThreeQuartersHash = {
   "operations" : [centerMonThreeQuarters],
   "repeat" : true
@@ -294,6 +312,14 @@ var monRightFullHash = {
 };
 var monRightTopHash = {
   "operations" : [monRightTop],
+  "repeat" : true
+};
+var monRightBottomHash = {
+  "operations" : [monRightBottom],
+  "repeat" : true
+};
+var monRightTinyMiddleHash = {
+  "operations" : [monRightTinyMiddle],
   "repeat" : true
 };
 var itermHash = {
@@ -332,8 +358,47 @@ var threeMonitorLayout = S.lay("threeMonitor", {
   "MacVim" : mvimHash,
   "iTerm" : itermHash,
   "iTerm2" : itermHash,
-  "Sublime Text 2" : centerRightHash,
+  "Sublime Text" : { // this is the name of 3 also
+    "operations" : [function(windowObject) {
+      var title = windowObject.title();
+      if (title.indexOf("—") > -1) {
+        // projects have this hyphen in them but individual files don't
+        // put projects on main monitor, individuals on left
+        // windowObject.doOperation(centerMonMost);
+        windowObject.doOperation(centerMonRight);
+      } else {
+        windowObject.doOperation(lapRight);
+      }
+    }],
+    "ignore-fail" : true,
+    "repeat" : true
+  },
+  // "Sublime Text 2" : centerRightHash,
+  "P4V": monRightTopHash,
+  "Activity Monitor" : monRightBottomHash,
+  "Activity Monitor" : {
+    "operations" : [function(windowObject) {
+      var title = windowObject.title();
+      if (title.match(/^Activity Monitor.*$/)) {
+        windowObject.doOperation(monRightBottom);
+      } else {
+        windowObject.doOperation(monRightTinyMiddle);
+      }
+    }],
+    // "operations" : [monRightBottom, monRightTinyMiddle],
+    "ignore-fail" : true,
+    // "title-order" : ["Activity Monitor"],
+    "repeat-last" : true
+  },
+  // Application: Activity Monitor
+  // Window: 'mono-sgen (15723) (Terminated)'
+  // "Activity Monitor" : monRightTinyMiddleHash,
+  "DataGrip" : monRightBottomHash,
+  "Cyberduck" : monRightBottomHash,
   "Xcode" : centerFullHash,
+  "IntelliJ IDEA" : centerMonMostHash,
+  "JetBrains Rider" : centerMonMostRightHash,
+  "GoLand" : centerMonMostRightHash,
   "Skype" : {
     "operations" : [lapSkype],
     "repeat" : true
@@ -343,7 +408,7 @@ var threeMonitorLayout = S.lay("threeMonitor", {
     "repeat" : true
   },
   "Slack" : {
-    "operations" : [lapSkype],
+    "operations" : [lapLeft],
     "repeat" : true
   },
   "Firefox" : genBrowserHash(/^Firebug\s-\s.+$/),
@@ -361,7 +426,8 @@ var threeMonitorLayout = S.lay("threeMonitor", {
   "MonoDevelop-Unity" : centerFullHash,
   "Unity" : {
     "operations" : [function(windowObject) {
-      windowObject.doOperation(centerFull);
+      windowObject.doOperation(centerMonLeft);
+      // windowObject.doOperation(centerFull);
     }],
     "ignore-fail" : true,
     "repeat" : true
