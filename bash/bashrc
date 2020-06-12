@@ -44,6 +44,10 @@ fi
 
 pathadd $JAVA_HOME/bin
 
+# bash history size - 20,000 commands / 20,000 lines
+HISTSIZE=20000
+HISTFILESIZE=20000
+
 #fast search in files, piped through cut to truncate long lines
 function acki() {
   ack --ignore-dir=web-compiled "$@" | cut -c 1-200;
@@ -57,13 +61,13 @@ function ackii() {
 #opens files with a specific name
 #usage fo file.txt
 function fo() {
-   vi `find -name $@`
+   vi `find . -name $@`
 }
 
 #shows files with a specific name
 #usage f file.txt
 function f() {
-   find -name "$@"
+   find . -name "$@"
 }
 
 #shows files with a specific name (case insensitive)
