@@ -84,6 +84,8 @@ function dotf() {
   cd ~/.dotfiles;
 }
 
+alias setupdisplays='displayplacer "id:E4F42FC9-A8A7-7175-3B99-3C1B504C7C11 res:2560x1440 hz:60 color_depth:8 scaling:on origin:(0,0) degree:0" "id:15279915-8419-78CD-B543-790721FA63DF res:1792x1120 hz:59 color_depth:4 scaling:on origin:(-1792,412) degree:0" "id:758A978D-C083-0F26-8718-E7B62B823969 res:1440x2560 hz:60 color_depth:8 scaling:on origin:(2560,-515) degree:90"'
+
 alias subup='git submodule update'
 
 #use color with ls
