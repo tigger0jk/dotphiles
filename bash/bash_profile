@@ -17,3 +17,5 @@ export PS1="[\u@\h \W]\$(parse_git_branch)\$ "
 PATH=$PATH:$HOME/bin
 
 export PATH
+
+eval "$(rbenv init -)"

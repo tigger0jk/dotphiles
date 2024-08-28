@@ -26,17 +26,41 @@ pathadd() {
   fi
 }
 
-export EDITOR='vim';
+export SLACK_DEVELOPER_MENU=true
+export EDITOR='vim'
+
+# export AWS_PROFILE='profile AdministratorAccess-211125436307-pfay'
+
+# IntelliJ struggles hard if I have this set
+# export GOPATH=~/go
+# pathadd $GOPATH/bin
+
+# export GOPATH=/usr/local/go
+# export GOPATH=/usr/local/go/bin/go
+# export GO111MODULE=on
+
+# grab unversioned python
+pathadd /usr/local/opt/python@3.11/libexec/bin
 
 if [[ ($platform == 'osx') ]]; then
+  # 2024 react native build needs jdk 17
+  export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home
+  # for my MBP 2020 machine
+  # export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-13.0.2.jdk/Contents/Home
   # for my local machine
-  export JAVA_HOME=/usr/local/java/latest
+  # export JAVA_HOME=/usr/local/java/latest
   export ANDROID_HOME=/Users/$USER/Library/Android/sdk
   pathadd $ANDROID_HOME/platform-tools
   pathadd $ANDROID_HOME/tools
+  # pathadd /Users/pfay/Downloads/elasticsearch-7.6.0/bin/
   # In theory this should be some command that sets sensitivity independent of accel but it doesn't fucking exist fuck you apple https://apple.stackexchange.com/questions/333989/how-do-i-disable-mouse-acceleration-and-adjust-tracking-speed-in-high-sierra
   # defaults write .GlobalPreferences com.apple.mouse.scaling -float 0.135
   defaults write .GlobalPreferences com.apple.mouse.scaling -1
+  defaults write -g com.apple.mouse.scaling -integer -1
+
+  # have to re-log for these to take effect
+  defaults write -g InitialKeyRepeat -int 20 # normal minimum is 15 (225 ms)
+  defaults write -g KeyRepeat -int 4
 else
   # for servers
   export JAVA_HOME=/usr/java/latest
@@ -50,18 +74,20 @@ HISTFILESIZE=20000
 
 #fast search in files, piped through cut to truncate long lines
 function acki() {
-  ack --ignore-dir=web-compiled "$@" | cut -c 1-200;
+  ack --ignore-dir=venv "$@" | cut -c 1-200;
 }
 
 #fast case insensitive search in files, piped through cut to truncate long lines
 function ackii() {
-  ack -i --ignore-dir=web-compiled "$@" | cut -c 1-200;
+  ack -i --ignore-dir=venv "$@" | cut -c 1-200;
 }
 
 #opens files with a specific name
 #usage fo file.txt
 function fo() {
-   vi `find . -name $@`
+  path=$(fii $@)
+  echo "Opening $path"
+  vi $path
 }
 
 #shows files with a specific name
@@ -84,7 +110,19 @@ function dotf() {
   cd ~/.dotfiles;
 }
 
-alias setupdisplays='displayplacer "id:E4F42FC9-A8A7-7175-3B99-3C1B504C7C11 res:2560x1440 hz:60 color_depth:8 scaling:on origin:(0,0) degree:0" "id:15279915-8419-78CD-B543-790721FA63DF res:1792x1120 hz:59 color_depth:4 scaling:on origin:(-1792,412) degree:0" "id:758A978D-C083-0F26-8718-E7B62B823969 res:1440x2560 hz:60 color_depth:8 scaling:on origin:(2560,-515) degree:90"'
+# Persistent screen id: E4F42FC9-A8A7-7175-3B99-3C1B504C7C11 - center monitor (landscape)
+# Persistent screen id: 15279915-8419-78CD-B543-790721FA63DF - work MBP monitor
+# Persistent screen id: 758A978D-C083-0F26-8718-E7B62B823969 - right monitor (portrait)
+# if this command fails for a certain display, turn that monitor off and back on again.
+# it can't find the mode not because of an issue with displayplacer but because the monitor isn't advertising the mode
+# added later
+# Persistent screen id: D15DA428-5573-FFF7-A42C-3901ED45119D # middle monitor
+# Persistent screen id: 758A978D-C083-0F26-8718-E7B62B823969
+# Persistent screen id: 15279915-8419-78CD-B543-790721FA63DF
+# Persistent screen id: B1931E8F-61C1-78E3-41DC-60EC534439B0 # right monitor on HDMI
+alias setupdisplays='displayplacer "id:E4F42FC9-A8A7-7175-3B99-3C1B504C7C11 res:2560x1440 hz:60 color_depth:8 scaling:on origin:(0,0) degree:0" "id:D15DA428-5573-FFF7-A42C-3901ED45119D res:2560x1440 hz:60 color_depth:8 scaling:on origin:(0,0) degree:0" "id:15279915-8419-78CD-B543-790721FA63DF res:1792x1120 hz:59 color_depth:4 scaling:on origin:(-1792,412) degree:0" "id:B1931E8F-61C1-78E3-41DC-60EC534439B0 res:1440x2560 hz:60 color_depth:8 scaling:on origin:(2560,-515) degree:90"'
+
+alias chainsetupdisplays='for i in {1..100}; do timeout 1 displayplacer "id:E4F42FC9-A8A7-7175-3B99-3C1B504C7C11 res:2560x1440 hz:60 color_depth:8 scaling:on origin:(0,0) degree:0" "id:15279915-8419-78CD-B543-790721FA63DF res:1792x1120 hz:59 color_depth:4 scaling:on origin:(-1792,412) degree:0" "id:758A978D-C083-0F26-8718-E7B62B823969 res:1440x2560 hz:60 color_depth:8 scaling:on origin:(2560,-515) degree:90"; done'
 
 alias subup='git submodule update'
 
@@ -135,3 +173,6 @@ alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.ar
 alias rsa='eval `ssh-agent`; ssh-add'
 
 alias jsonlint='python -m json.tool'
+
+# file is not checked in
+source ~/.dotfiles/bash/ushabtirc

@@ -63,6 +63,13 @@ var lapFull = S.op("move", {
   "width" : "screenSizeX",
   "height" : "screenSizeY"
 });
+var lapMiddleThreeQuarters = S.op("move", {
+  "screen" : monLaptop,
+  "x" : "screenOriginX + screenSizeX/8",
+  "y" : "screenOriginY",
+  "width" : "screenSizeX*3/4",
+  "height" : "screenSizeY"
+});
 var lapLeft = S.op("move", {
   "screen" : monLaptop,
   "x" : "screenOriginX",
@@ -75,6 +82,13 @@ var lapRight = S.op("move", {
   "x" : "screenOriginX + screenSizeX/2",
   "y" : "screenOriginY",
   "width" : "screenSizeX/2",
+  "height" : "screenSizeY"
+});
+var lapRightThreeQuarters = S.op("move", {
+  "screen" : monLaptop,
+  "x" : "screenOriginX + screenSizeX/4",
+  "y" : "screenOriginY",
+  "width" : "screenSizeX*3/4",
   "height" : "screenSizeY"
 });
 var lapUpperRight = S.op("move", {
@@ -182,6 +196,13 @@ var mainLeftHalf = slate.operation("move", {
    "width" : "screenSizeX/2",
    "height" : "screenSizeY"
 });
+var centerMonRightThird = slate.operation("move", {
+   "screen" : monCenter,
+   "x" : "screenOriginX+2*screenSizeX/3",
+   "y" : "screenOriginY",
+   "width" : "1*screenSizeX/3",
+   "height" : "screenSizeY"
+});
 var centerMonThreeQuarters = slate.operation("move", {
    "screen" : monCenter,
    "x" : "screenOriginX+screenSizeX/8",
@@ -203,9 +224,19 @@ var centerMonMostRight = slate.operation("move", {
    "width" : "9*screenSizeX/10",
    "height" : "9*screenSizeY/10"
 });
+var centerMonMostRightDown = slate.operation("move", {
+   "screen" : monCenter,
+   "x" : "screenOriginX+screenSizeX/10",
+   "y" : "screenOriginY+3*screenSizeY/40",
+   "width" : "9*screenSizeX/10",
+   "height" : "9*screenSizeY/10"
+});
 
 //More window placements, but written in a shorter fashion
 var centerMonLeft = centerFull.dup({ "width" : "3*screenSizeX/5" });
+var centerMonLeft2 = centerMonLeft.dup({ "x" : "screenOriginX+screenSizeX/5" });
+var centerMonLeft3 = centerMonLeft.dup({ "x" : "screenOriginX+2*screenSizeX/5" });
+var centerMonLeft4 = centerMonLeft.dup({ "x" : "screenOriginX+3*screenSizeX/5" });
 var centerMonMid = centerMonLeft.dup({ "x" : "screenOriginX+screenSizeX/3" });
 var centerMonRight = centerMonLeft.dup({ "x" : "screenOriginX+(screenSizeX*2/5)" });
 var centerMonLeftTop = centerMonLeft.dup({ "height" : "screenSizeY/2" });
@@ -302,6 +333,11 @@ var centerMonMostRightHash = {
   "operations" : [centerMonMostRight],
   "repeat" : true
 };
+var ideHash = {
+  "operations" : [centerMonMostRight, centerMonMostRightDown],
+  "repeat-last" : true,
+  "sort-title" : true
+}
 var centerMonThreeQuartersHash = {
   "operations" : [centerMonThreeQuarters],
   "repeat" : true
@@ -327,16 +363,29 @@ var itermHash = {
     "repeat-last" : true,
     "sort-title" : true
 };
+var reactotronHash = {
+    "operations" : [centerMonRightThird],
+    "repeat" : true
+};
+// var genBrowserHash = function(regex) {
+  // return {
+    // "operations" : [function(windowObject) {
+      // var title = windowObject.title();
+      // if (title !== undefined && title.match(regex)) {
+        // windowObject.doOperation(monRightTop);
+      // } else {
+        // windowObject.doOperation(centerMonThreeQuarters);
+      // }
+    // }],
+    // "ignore-fail" : true,
+    // "repeat" : true
+  // };
+// };
 var genBrowserHash = function(regex) {
   return {
-    "operations" : [function(windowObject) {
-      var title = windowObject.title();
-      if (title !== undefined && title.match(regex)) {
-        windowObject.doOperation(monRightTop);
-      } else {
-        windowObject.doOperation(centerMonThreeQuarters);
-      }
-    }],
+    // which order these are in is totally arbitrary and likely unstable, can't figure out how to differentiate the chrome main window based on window info
+    "operations" : [monRightTop, centerMonThreeQuarters],
+    // "operations" : [centerMonThreeQuarters, monRightTop],
     "ignore-fail" : true,
     "repeat" : true
   };
@@ -358,6 +407,7 @@ var threeMonitorLayout = S.lay("threeMonitor", {
   "MacVim" : mvimHash,
   "iTerm" : itermHash,
   "iTerm2" : itermHash,
+  "Reactotron" : reactotronHash,
   "Sublime Text" : { // this is the name of 3 also
     "operations" : [function(windowObject) {
       var title = windowObject.title();
@@ -374,7 +424,9 @@ var threeMonitorLayout = S.lay("threeMonitor", {
     "repeat" : true
   },
   // "Sublime Text 2" : centerRightHash,
+  "Spine" : centerRightHash,
   "P4V": monRightTopHash,
+  "Docker Desktop" : monRightBottomHash,
   "Activity Monitor" : monRightBottomHash,
   "Activity Monitor" : {
     "operations" : [function(windowObject) {
@@ -411,6 +463,10 @@ var threeMonitorLayout = S.lay("threeMonitor", {
     "operations" : [lapLeft],
     "repeat" : true
   },
+  "Discord" : {
+    "operations" : [lapLeft],
+    "repeat" : true
+  },
   "Firefox" : genBrowserHash(/^Firebug\s-\s.+$/),
   "Google Chrome" : genBrowserHash(/^Developer\sTools\s-\s.+$/),
   "Safari" : centerMonThreeQuartersHash,
@@ -423,15 +479,18 @@ var threeMonitorLayout = S.lay("threeMonitor", {
     "repeat" : true
   },
   "FileZilla" : centerMonThreeQuartersHash,
+  "Cursor" : ideHash,
   "MonoDevelop-Unity" : centerFullHash,
-  "Unity" : {
-    "operations" : [function(windowObject) {
-      windowObject.doOperation(centerMonLeft);
-      // windowObject.doOperation(centerFull);
-    }],
-    "ignore-fail" : true,
-    "repeat" : true
-  },
+  // "Unity" : {
+    // "operations" : [centerMonLeft, centerMonLeft2, centerMonLeft3, centerMonLeft4],
+    // // "operations" : [function(windowObject) {
+      // // windowObject.doOperation(centerMonLeft);
+      // // // windowObject.doOperation(centerFull);
+    // // }],
+    // // "sort-title" : true,
+    // "ignore-fail" : true,
+    // "repeat" : true
+  // },
   "Atom" : centerFullHash,
   "Microsoft Outlook" : {
     "operations" : [function(windowObject) {
@@ -466,18 +525,46 @@ var twoMonitorLayout = S.lay("twoMonitor", {
     "repeat-last" : true
   },
   "MacVim" : mvimHash,
-  "iTerm" : centerFullHash,
-  "iTerm2" : centerFullHash,
+  // "iTerm" : centerFullHash,
+  // "iTerm2" : centerFullHash,
+  "iTerm" : itermHash,
+  "iTerm2" : itermHash,
+  "JetBrains Rider" : centerMonMostRightHash,
+  "GoLand" : centerMonMostRightHash,
   "Xcode" : centerMonBigHash,
-  "Google Chrome" : genBrowserHash(/^Developer\sTools\s-\s.+$/),
+  "Sublime Text" : lapRightHash, // also the name of 3
+  "Slack" : {
+    "operations" : [lapLeft],
+    "repeat" : true
+  },
+  "Discord" : {
+    "operations" : [lapLeft],
+    "repeat" : true
+  },
+  "P4V": centerRightHash,
+  // "Unity" : {
+    // "operations" : [/*centerMonLeft*/, centerMonLeft2, centerMonLeft3, centerMonLeft4],
+    // // "operations" : [function(windowObject) {
+      // // windowObject.doOperation(centerMonLeft);
+      // // // windowObject.doOperation(centerFull);
+    // // }],
+    // // "sort-title" : true,
+    // "ignore-fail" : true,
+    // "repeat" : true
+  // },
+  // "Google Chrome" : genBrowserHash(/^Developer\sTools\s-\s.+$/),
+  "Google Chrome" : {
+    "operations" : [centerMonThreeQuarters],
+    "repeat" : true
+  },
   "GitX" : {
     "operations" : [lapFull],
     "repeat" : true
   },
   "Firefox" : genBrowserHash(/^Firebug\s-\s.+$/),
-  "Safari" : lapFullHash,
+  "Safari" : centerMonThreeQuarters,
   "Spotify" : {
-    "operations" : [lapFull],
+    "operations" : [lapMiddleThreeQuarters],
     "repeat" : true
   },
   "TextEdit" : {
@@ -611,18 +698,18 @@ S.bnda({
 
   // Focus Bindings
   // NOTE: some of these may *not* work if you have not removed the expose/spaces/mission control bindings
-  "l:cmd" : S.op("focus", { "direction" : "right" }),
-  "h:cmd" : S.op("focus", { "direction" : "left" }),
+  // "l:cmd" : S.op("focus", { "direction" : "right" }),
+  // "h:cmd" : S.op("focus", { "direction" : "left" }),
   //"k:cmd" : S.op("focus", { "direction" : "up" }),
-  "j:cmd" : S.op("focus", { "direction" : "down" }),
-  "k:cmd;alt" : S.op("focus", { "direction" : "behind" }),
-  "j:cmd;alt" : S.op("focus", { "direction" : "behind" }),
-  "right:cmd" : S.op("focus", { "direction" : "right" }),
-  "left:cmd" : S.op("focus", { "direction" : "left" }),
-  "up:cmd" : S.op("focus", { "direction" : "up" }),
-  "down:cmd" : S.op("focus", { "direction" : "down" }),
-  "up:cmd;alt" : S.op("focus", { "direction" : "behind" }),
-  "down:cmd;alt" : S.op("focus", { "direction" : "behind" }),
+  // "j:cmd" : S.op("focus", { "direction" : "down" }),
+  // "k:cmd;alt" : S.op("focus", { "direction" : "behind" }),
+  // "j:cmd;alt" : S.op("focus", { "direction" : "behind" }),
+  // "right:cmd" : S.op("focus", { "direction" : "right" }),
+  // "left:cmd" : S.op("focus", { "direction" : "left" }),
+  // "up:cmd" : S.op("focus", { "direction" : "up" }),
+  // "down:cmd" : S.op("focus", { "direction" : "down" }),
+  // "up:cmd;alt" : S.op("focus", { "direction" : "behind" }),
+  // "down:cmd;alt" : S.op("focus", { "direction" : "behind" }),
 
   // Window Hints
   "esc:cmd" : S.op("hint"),
@@ -641,6 +728,7 @@ S.bnda({
 
 // Do something when a window is opened, some of these are commented out since I found them often more annoying than helpful
 slate.on("windowOpened", function(event, win) {
+  S.log("window opened: " + win.app().name())
   switch(win.app().name()) {
     case "iTerm":
     case "iTerm2":
@@ -656,6 +744,56 @@ slate.on("windowOpened", function(event, win) {
 
   }
 });
+
+// slate.on("windowFocused", function(event, win) {
+// slate.on("windowMoved", function(event, win) {
+  // S.log("window moved: " + win.app().name())
+  // switch(win.app().name()) {
+    // // case "Unity":
+      // // win.doOperation(centerFull);
+      // // break;
+    // default:
+
+  // }
+// });
+
+// slate.on("appActivated", function(event, app) {
+  // S.log("app activated: " + app.name())
+  // switch(app.name()) {
+    // // case "Unity":
+      // // app.mainWindow().doOperation(centerFull);
+      // // break;
+    // default:
+
+  // }
+// });
+
+var unityApps = []
+// TODO do we need to handle this for different layouts?
+var unityOperations = [centerMonLeft, centerMonLeft2, centerMonLeft3, centerMonLeft4]
+
+function layoutUnity() {
+  S.log("Layout Unity")
+  slate.eachApp(function(appObject) {
+    S.log("Layout Unity App " + appObject.name())
+    if (appObject.name() == "Unity") {
+      // TODO this check never worked, but if we later want to re-lay this out on some operations, we need to ensure we don't re-add the same objects (could have a "first call" bool param to only do it once, or could just check if they array is empty before the foreach is called
+      // if (!unityApps.includes(appOjbect)) {
+        unityApps.push(appObject)
+      // }
+    }
+    // do something with the appObject. this function will run once per running application.
+  });
+
+  S.log("Unity Apps Count: " + unityApps.length)
+  for (var i = 0; i < unityApps.length; i++) {
+    var unityApp = unityApps[i];
+    var unityOperation = unityOperations[i % unityOperations.length]
+    unityApp.mainWindow().doOperation(unityOperation)
+  }
+}
+
+layoutUnity()
 
 // Test Cases
 S.src(".slate.test", true);
