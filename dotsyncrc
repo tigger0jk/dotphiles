@@ -26,6 +26,7 @@ bin:bin
 #ctags/ctags
 #cmus
 #curl/curlrc
+config/karabiner.json:.config/karabiner/karabiner.json
 #git/gitconfig
 #git/gitignore
 #git/gitattributes
