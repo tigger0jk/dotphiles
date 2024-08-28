@@ -26,6 +26,7 @@ bin:bin
 #ctags/ctags
 #cmus
 #curl/curlrc
+cursor/extensions/extensions.json:.cursor/extensions/extensions.json
 config/karabiner.json:.config/karabiner/karabiner.json
 #git/gitconfig
 #git/gitignore
@@ -86,6 +87,7 @@ vim/vimrc
 ## hostname                     type=masterhost, ANY or NONE    files=dotfile:tolink,another:tolink
 [hosts]
 Patricks-MBP 			 git=ANY                                                #MBP 2020 macbook
+Patricks-MBP-2 			 git=ANY                                                #MBP 2020 macbook alt...
 Patricks-MacBook-Pro             git=ANY                                                #MBP 2020 macbook
 #DESKTOP-498IPOV                  git=ANY                                                #local machine
 #host1.example.com               git=ANY                        files=custom/dotfile    #git repo, pull from anywhere and link a custom dotfile
